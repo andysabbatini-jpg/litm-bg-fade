@@ -1,42 +1,33 @@
-// LITM Background Fade Module
-function applyBgFade(app) {
-  const windowContent = app.element?.querySelector(".window-content") 
-    || document.querySelector(`#${app.id} .window-content`)
-    || app.element;
+// LITM Background Fade Module - V2
 
+function applyBgFade() {
+  const windowContent = document.querySelector(".window-content[style*='background-image']");
   if (!windowContent) return;
-
-  const bgImage = windowContent.style.backgroundImage;
-  if (!bgImage || bgImage === "none" || bgImage === "") return;
-
   if (windowContent.querySelector(".litm-bg-layer")) return;
 
-  const bgEl = document.createElement("div");
-  bgEl.className = "litm-bg-layer";
-  bgEl.style.cssText = `
-    position: absolute;
-    inset: 0;
-    background-image: ${bgImage};
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    pointer-events: none;
-    z-index: 0;
-    -webkit-mask-image: linear-gradient(to right, black 65%, transparent 95%);
-    mask-image: linear-gradient(to right, black 65%, transparent 95%);
-  `;
+  const bgUrl = windowContent.style.backgroundImage;
+  if (!bgUrl || bgUrl === "none") return;
 
-  windowContent.style.backgroundImage = "none";
+  windowContent.style.removeProperty('background-image');
   windowContent.style.position = "relative";
-  windowContent.insertBefore(bgEl, windowContent.firstChild);
+
+  const bg = document.createElement("div");
+  bg.className = "litm-bg-layer";
+  bg.style.position = "absolute";
+  bg.style.inset = "0";
+  bg.style.backgroundImage = bgUrl;
+  bg.style.backgroundSize = "cover";
+  bg.style.backgroundPosition = "center";
+  bg.style.backgroundRepeat = "no-repeat";
+  bg.style.pointerEvents = "none";
+  bg.style.zIndex = "0";
+  bg.style.webkitMaskImage = "linear-gradient(to right, black 65%, transparent 95%)";
+  bg.style.maskImage = "linear-gradient(to right, black 65%, transparent 95%)";
+  windowContent.insertBefore(bg, windowContent.firstChild);
 }
 
-Hooks.on("renderApplication", (app, html) => {
-  if (app.constructor.name === "MistEngineLegendInTheMistCharacterSheet") {
-    applyBgFade(app);
-  }
-});
+// Esegui ad ogni render di qualsiasi Application
+Hooks.on("renderApplication", () => applyBgFade());
 
-Hooks.on("renderMistEngineLegendInTheMistCharacterSheet", (app, html) => {
-  applyBgFade(app);
-});
+// Anche dopo un breve delay per sicurezza
+Hooks.on("renderApplication", () => setTimeout(applyBgFade, 200));
