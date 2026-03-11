@@ -1,16 +1,16 @@
 // LITM Background Fade Module
-// Sposta il background-image della scheda personaggio su un elemento figlio
-// separato, così può essere sfumato con CSS senza influenzare il contenuto.
+function applyBgFade(app) {
+  const windowContent = app.element?.querySelector(".window-content") 
+    || document.querySelector(`#${app.id} .window-content`)
+    || app.element;
 
-Hooks.on("renderMistEngineLegendInTheMistCharacterSheet", (app, html, data) => {
-  const windowContent = html[0].closest(".window-content") || html.find(".window-content")[0];
-  
   if (!windowContent) return;
 
   const bgImage = windowContent.style.backgroundImage;
   if (!bgImage || bgImage === "none" || bgImage === "") return;
 
-  // Crea elemento figlio per lo sfondo
+  if (windowContent.querySelector(".litm-bg-layer")) return;
+
   const bgEl = document.createElement("div");
   bgEl.className = "litm-bg-layer";
   bgEl.style.cssText = `
@@ -26,10 +26,17 @@ Hooks.on("renderMistEngineLegendInTheMistCharacterSheet", (app, html, data) => {
     mask-image: linear-gradient(to right, black 65%, transparent 95%);
   `;
 
-  // Rimuovi il background dall'elemento originale
   windowContent.style.backgroundImage = "none";
   windowContent.style.position = "relative";
-
-  // Inserisci come primo figlio
   windowContent.insertBefore(bgEl, windowContent.firstChild);
+}
+
+Hooks.on("renderApplication", (app, html) => {
+  if (app.constructor.name === "MistEngineLegendInTheMistCharacterSheet") {
+    applyBgFade(app);
+  }
+});
+
+Hooks.on("renderMistEngineLegendInTheMistCharacterSheet", (app, html) => {
+  applyBgFade(app);
 });
