@@ -1,0 +1,16 @@
+{
+  "id": "litm-bg-fade",
+  "title": "LITM Background Fade",
+  "description": "Aggiunge una sfumatura al bordo destro dell'immagine di sfondo della scheda personaggio di Legend in the Mist.",
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": "13",
+    "verified": "13"
+  },
+  "esmodules": ["litm-bg-fade.js"],
+  "authors": [
+    {
+      "name": "Custom"
+    }
+  ]
+}
